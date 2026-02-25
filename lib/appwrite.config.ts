@@ -1,6 +1,7 @@
+import * as sdk from "node-appwrite";
 import {
   Client,
-  Databases,
+  TablesDB,
   Functions,
   Messaging,
   Storage,
@@ -24,8 +25,9 @@ client
   .setEndpoint(ENDPOINT!) // Your API Endpoint
   .setProject(PROJECT_ID!) // Your project ID
   .setKey(API_KEY!);
-
-export const databases = new Databases(client);
+console.log('ENDPOINT',ENDPOINT);
+export const tablesDB = new TablesDB(client);
+export const databases = new sdk.Databases(client);
 export const storage = new Storage(client);
 export const functions = new Functions(client);
 export const messaging = new Messaging(client);

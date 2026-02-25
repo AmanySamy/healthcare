@@ -1,9 +1,11 @@
 import RegisterForm from "@/components/forms/RegisterForm";
+import { getUser } from "@/lib/actions/patient.actions";
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 
-const Register = ({ params : { userId } }: SearchParamProps) => {
+const Register = async ({ params }: SearchParamProps) => {
+  const { userId } = await params;
+  const user = await getUser(userId);
   return (
    <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container">
@@ -15,7 +17,7 @@ const Register = ({ params : { userId } }: SearchParamProps) => {
             height={1000}
           className="mb-12 h-10 w-fit"
           />
-          <RegisterForm user={userId} />
+          <RegisterForm user={user} />
             <p className="copyright py-12 justify-items-end text-dark-600 xl:text-left">
               © 2024 HealthStack. All rights reserved.
             </p>

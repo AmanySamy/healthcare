@@ -26,7 +26,6 @@ const RegisterForm = ({ user }: { user: User }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
   type PatientFormInput = z.infer<typeof PatientFormValidation>;
-
   const form = useForm<PatientFormInput>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
@@ -56,7 +55,7 @@ const RegisterForm = ({ user }: { user: User }) => {
 
     try {
       const patientData = {
-        
+
         userId: user.$id,
         name: values.name,
         email: values.email,
@@ -170,7 +169,7 @@ const RegisterForm = ({ user }: { user: User }) => {
                     {GenderOptions.map((option, i) => (
                       <div key={option + i} className="radio-group">
                         <RadioGroupItem value={option} id={option} />
-                        <Label htmlFor={option} className="cursor-pointer">
+                        <Label htmlFor={option} className="cursor-pointer capitalize">
                           {option}
                         </Label>
                       </div>
