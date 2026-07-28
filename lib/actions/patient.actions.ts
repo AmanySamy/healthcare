@@ -10,7 +10,6 @@ import {
   tablesDB,
   storage,
   users,
-  databases,
 } from "../appwrite.config";
 import { parseStringify } from "../utils";
 import { InputFile } from "node-appwrite/file";
@@ -92,7 +91,9 @@ export const registerPatient = async ({
       rowId: ID.unique(),
       data: {
         identificationDocumentId: file?.$id ? file.$id : null,
-        identificationDocumentUrl: file?.$id ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}` : null,
+        identificationDocumentUrl: file?.$id
+          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
+          : null,
         userId: userId,
         name: name,
         email: email,
@@ -115,7 +116,7 @@ export const registerPatient = async ({
         PrivacyConsent: privacyConsent,
       },
     });
-    console.log('newPatient', newPatient)
+    console.log("newPatient", newPatient);
 
     return parseStringify(newPatient);
   } catch (error) {

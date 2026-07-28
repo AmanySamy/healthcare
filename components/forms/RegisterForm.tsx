@@ -232,7 +232,7 @@ const RegisterForm = ({ user }: { user: User }) => {
             name="primaryPhysician"
             label="Primary Care Physician"
             placeholder="Select a physician"
-          >
+            >
             {Doctors.map((doctor, i) => (
               <SelectItem key={doctor.name + i} value={doctor.name}>
                 <div className="flex cursor-pointer items-center gap-2">
