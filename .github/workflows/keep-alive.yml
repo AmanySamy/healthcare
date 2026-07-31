@@ -1,0 +1,17 @@
+name: Keep Appwrite Active
+
+on:
+  schedule:
+    - cron: "*/30 * * * *" # Every 30 minutes
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Appwrite
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+          -H "X-Appwrite-Project: 686fef8c0013a6373ee7" \
+          "https://fra.cloud.appwrite.io/v1/account"
