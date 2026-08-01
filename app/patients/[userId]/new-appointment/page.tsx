@@ -18,9 +18,7 @@ const NewAppointment = async ({ params }: { params: { userId: string } }) => {
             className="mb-12 h-10 w-fit"
           />
           <AppointmentForm type='create' userID={userId} patientId={patient?.$id} />
-          <p className="copyright py-12 justify-items-end text-dark-600 xl:text-left">
-            © 2024 HealthStack. All rights reserved.
-          </p>
+          
         </div>
       </section>
 

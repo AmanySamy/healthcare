@@ -24,7 +24,7 @@ export interface Patient extends Models.Document {
   privacyConsent: boolean;
 }
 
-export interface Appointment extends Models.Document {
+export interface Appointment extends Models.DefaultRow {
   patient: Patient;
   schedule: Date;
   status: Status;

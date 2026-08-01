@@ -71,9 +71,6 @@ const Success = async ({
           </Link>
         </Button>
 
-        <p className="copyright py-12 justify-items-end text-dark-600 xl:text-left">
-          © 2024 HealthStack. All rights reserved.
-        </p>
       </div>
     </div>
   );

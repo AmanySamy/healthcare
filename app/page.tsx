@@ -1,10 +1,13 @@
 import Image from "next/image";
 import PatientForm from "../components/forms/PatientForm";
 import Link from "next/link";
+import PassKeyModal from "@/components/PassKeyModal";
 
-export default function Home() {
+export default function Home({searchParams}: {searchParams: {admin: string}}) {
+  const isAdmin = searchParams.admin === "true";
   return (
     <div className="flex h-screen max-h-screen">
+      {isAdmin && <PassKeyModal />}
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-[496px]">
           <Image
@@ -15,10 +18,7 @@ export default function Home() {
             className="mb-12 h-10 w-fit"
           />
           <PatientForm />
-          <div className="text-14-regular mt-20 flex justify-between">
-            <p className="justify-items-end text-dark-600 xl:text-left">
-              © 2024 HealthStack. All rights reserved.
-            </p>
+          <div className="text-14-regular mt-20 flex justify-end">
             <Link href="/?admin-true" className="text-green-500">Admin</Link>
           </div>
         </div>
