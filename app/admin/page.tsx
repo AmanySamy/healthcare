@@ -3,8 +3,15 @@ import Link from "next/link";
 import Image from "next/image";
 import StatCard from "@/components/StatCard";
 import { getRecentAppointments } from "@/lib/actions/appointment.actions";
+import { DataTable } from "@/components/table/DataTable";
+import { columns } from "@/components/table/columns";
+import { Appointment } from "@/types/appwrite.types";
+
 const AdminPage = async () => {
   const appointments = await getRecentAppointments();
+  console.log(appointments);
+
+
   const Statistics = [
     {
       type: "appointments",
@@ -25,6 +32,7 @@ const AdminPage = async () => {
       icon: "/assets/icons/cancelled.svg",
     },
   ];
+  // const data = await getData();
   return (
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
       <header className="admin-header">
@@ -32,8 +40,8 @@ const AdminPage = async () => {
           <Image
             src="/assets/icons/logo-full.svg"
             alt="Logo"
-            width={32}
-            height={162}
+            height={32}
+            width={162}
           />
         </Link>
         <p className="text-16-semibold">Admin Dashboard</p>
@@ -50,7 +58,7 @@ const AdminPage = async () => {
             <StatCard key={index} stat={stat} />
           ))}
         </section>
-        {/* <DataTable columns={columns} data={appointments.rows} /> */}
+        <DataTable columns={columns} data={appointments.documents} />
       </main>
     </div>
   );
