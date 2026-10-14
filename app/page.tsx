@@ -3,8 +3,12 @@ import PatientForm from "../components/forms/PatientForm";
 import Link from "next/link";
 import PassKeyModal from "@/components/PassKeyModal";
 
-export default function Home({searchParams}: {searchParams: {admin: string}}) {
-  const isAdmin = searchParams.admin === "true";
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ admin?: string }>;
+}) {
+  const isAdmin = (await searchParams).admin === "true";
   return (
     <div className="flex h-screen max-h-screen">
       {isAdmin && <PassKeyModal />}

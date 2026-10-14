@@ -3,8 +3,12 @@ import { getPatient } from "@/lib/actions/patient.actions";
 import Image from "next/image";
 import React from "react";
 
-const NewAppointment = async ({ params }: { params: { userId: string } }) => {
-  const { userId } = params;
+const NewAppointment = async ({
+  params,
+}: {
+  params: Promise<{ userId: string }>;
+}) => {
+  const { userId } = await params;
   const patient = await getPatient(userId);
   return (
     <div className="flex h-screen max-h-screen">
@@ -17,7 +21,7 @@ const NewAppointment = async ({ params }: { params: { userId: string } }) => {
             height={1000}
             className="mb-12 h-10 w-fit"
           />
-          <AppointmentForm type='create' userID={userId} patientId={patient?.$id} />
+          <AppointmentForm type='create' userId={userId} patientId={patient?.$id} />
           
         </div>
       </section>

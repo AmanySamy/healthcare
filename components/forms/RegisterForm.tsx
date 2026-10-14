@@ -25,8 +25,9 @@ import { FileUploader } from "@/components/FileUploader";
 const RegisterForm = ({ user }: { user: User }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
-  type PatientFormInput = z.infer<typeof PatientFormValidation>;
-  const form = useForm<PatientFormInput>({
+  type PatientFormInput = z.input<typeof PatientFormValidation>;
+  type PatientFormOutput = z.output<typeof PatientFormValidation>;
+  const form = useForm<PatientFormInput, any, PatientFormOutput>({
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
       ...PatientFormDefaultValues,

@@ -5,11 +5,10 @@ import { formatDateTime } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
-const Success = async ({
-  params: { userId },
-  searchParams,
-}: SearchParamProps) => {
-  const appointmentId = (searchParams.appointmentId as string) || "";
+const Success = async ({ params, searchParams }: SearchParamProps) => {
+  const { userId } = await params;
+  const resolvedSearchParams = await searchParams;
+  const appointmentId = (resolvedSearchParams.appointmentId as string) || "";
   const appointment = await getAppointment(appointmentId);
 
   const doctor = Doctors.find(
