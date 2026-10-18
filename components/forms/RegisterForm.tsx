@@ -84,7 +84,7 @@ const RegisterForm = ({ user }: { user: User }) => {
       console.log("Patient Registration Payload:", patientData);
 
       const newPatient = await registerPatient(patientData);
-
+      console.log("New Patient Created:", newPatient);
       if (newPatient) {
         router.push(`/patients/${user.$id}/new-appointment`);
       }
@@ -103,7 +103,7 @@ const RegisterForm = ({ user }: { user: User }) => {
       >
         {/* Header Section */}
         <section className="space-y-4">
-          <h1 className="header">Welcome 👋</h1>
+          <h1 className="header text-white">Welcome 👋</h1>
           <p className="text-dark-700">Let us know more about yourself.</p>
         </section>
 
@@ -170,7 +170,7 @@ const RegisterForm = ({ user }: { user: User }) => {
                     {GenderOptions.map((option, i) => (
                       <div key={option + i} className="radio-group">
                         <RadioGroupItem value={option} id={option} />
-                        <Label htmlFor={option} className="cursor-pointer capitalize">
+                        <Label htmlFor={option} className="cursor-pointer capitalize text-white">
                           {option}
                         </Label>
                       </div>

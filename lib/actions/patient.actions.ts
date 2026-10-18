@@ -132,8 +132,17 @@ export const getPatient = async (userId: string) => {
       queries: [Query.equal("userId", [userId])],
     });
 
-    return parseStringify(patients.rows[0]);
+    const patient = patients.rows[0] ?? await tablesDB.getRow({
+      databaseId: DATABASE_ID!,
+      tableId: PATIENT_COLLECTION_ID!,
+      rowId: userId,
+    });
+
+    return parseStringify(patient);
   } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === 404) {
+      return null;
+    }
     console.error(
       "An error occurred while retrieving the patient details:",
       error,
