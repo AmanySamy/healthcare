@@ -1,7 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import {encryptKey, decryptKey} from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import {
+  checkAdminSession,
+  verifyAdminPasskey,
+} from "@/lib/actions/admin.actions";
 import {
   InputOTP,
   InputOTPGroup,
@@ -19,40 +22,52 @@ import {
 import Image from "next/image";
 const PassKeyModal = () => {
   const router = useRouter();
-  const path = usePathname();
   const [isOpen, setIsOpen] = useState(true);
   const [passkey, setPasskey] = useState("");
   const [error, setError] = useState("");
-
-  const encryptedKey = typeof window !== "undefined" ? window.localStorage.getItem('accessKey') : null;
+  const [isLoading, setIsLoading] = useState(false);
   const closeModal = () => {
     setIsOpen(false);
     router.push("/");
   };
 
-
   useEffect(() => {
-    const accesskey = encryptedKey ? decryptKey(encryptedKey) : null;
-    if(path) {
-      if(accesskey === process.env.NEXT_PUBLIC_ADMIN_PASSKEY) {
+    let active = true;
+    window.localStorage.removeItem("accessKey");
+    checkAdminSession()
+      .then((authorized) => {
+        if (active && authorized) {
+          setIsOpen(false);
+          router.push("/admin");
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [router]);
+
+  const validatePasskey = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    try {
+      if (await verifyAdminPasskey(passkey)) {
         setIsOpen(false);
         router.push("/admin");
+        router.refresh();
       } else {
-        setIsOpen(true);
+        setError(
+          "Unable to verify access. Check the passkey or try again later.",
+        );
       }
-    }
-  }, [encryptedKey]);
-
-  const validatePasskey = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    if (passkey === process.env.NEXT_PUBLIC_ADMIN_PASSKEY) {
-       const encryptedKey = encryptKey(passkey);
-
-      localStorage.setItem("accessKey", encryptedKey);
-
-      setIsOpen(false);
-    } else {
-      setError("Invalid passkey, please try again.");
+    } catch {
+      setError("Unable to verify access. Please try again later.");
+    } finally {
+      setPasskey("");
+      setIsLoading(false);
     }
   };
   return (
@@ -75,7 +90,7 @@ const PassKeyModal = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div>
-           <InputOTP
+          <InputOTP
             maxLength={6}
             value={passkey}
             onChange={(value) => setPasskey(value)}
@@ -89,10 +104,20 @@ const PassKeyModal = () => {
               <InputOTPSlot className="shad-otp-slot" index={5} />
             </InputOTPGroup>
           </InputOTP>
-          {error && <p className="shad-error text-14-regular mt-4 flex justify-center">{error}</p>}
+          {error && (
+            <p className="shad-error text-14-regular mt-4 flex justify-center">
+              {error}
+            </p>
+          )}
         </div>
         <AlertDialogFooter>
-          <AlertDialogAction className="shad-primary-btn w-full" onClick={(e) => validatePasskey(e)}>Enter admin panel</AlertDialogAction>
+          <AlertDialogAction
+            className="shad-primary-btn w-full"
+            disabled={isLoading || passkey.length !== 6}
+            onClick={validatePasskey}
+          >
+            Enter admin panel
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

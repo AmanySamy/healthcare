@@ -6,11 +6,13 @@ import { getRecentAppointments } from "@/lib/actions/appointment.actions";
 import { DataTable } from "@/components/table/DataTable";
 import { columns } from "@/components/table/columns";
 import { Appointment } from "@/types/appwrite.types";
+import { isAdmin } from "@/lib/auth";
+import { logoutAdmin } from "@/lib/actions/admin.actions";
+import { redirect } from "next/navigation";
 
 const AdminPage = async () => {
+  if (!(await isAdmin())) redirect("/?admin=true");
   const appointments = await getRecentAppointments();
-  console.log(appointments);
-
 
   const Statistics = [
     {
@@ -45,6 +47,17 @@ const AdminPage = async () => {
           />
         </Link>
         <p className="text-16-semibold">Admin Dashboard</p>
+        <form
+          action={async () => {
+            "use server";
+            await logoutAdmin();
+            redirect("/?admin=true");
+          }}
+        >
+          <button type="submit" className="text-14-regular">
+            Sign out
+          </button>
+        </form>
       </header>
       <main className="admin-main">
         <section className="w-full space-y-4">

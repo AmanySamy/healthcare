@@ -7,18 +7,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import { CreateAppointmentSchema } from "@/lib/validation";
+import { getAppointmentSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 import { FormFieldType } from "./PatientForm";
 import Image from "next/image";
 import { Doctors } from "@/constants";
 import { SelectItem } from "@/components/ui/select";
-import { createAppointment, updateAppointment } from "@/lib/actions/appointment.actions";
+import {
+  createAppointment,
+  updateAppointment,
+} from "@/lib/actions/appointment.actions";
 import { Appointment } from "@/types/appwrite.types";
 const AppointmentForm = ({
   userId,
   patientId,
-  type = 'create',
+  type = "create",
   appointment,
   setOpen,
 }: {
@@ -31,15 +34,28 @@ const AppointmentForm = ({
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const AppointmentFormValidation = CreateAppointmentSchema;
-  const form = useForm({
+  const AppointmentFormValidation = getAppointmentSchema(type);
+  const form = useForm<
+    z.input<typeof AppointmentFormValidation>,
+    any,
+    z.output<typeof AppointmentFormValidation>
+  >({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      primaryPhysician: appointment && appointment.primaryPhysician ? appointment.primaryPhysician : "",
+      primaryPhysician:
+        appointment && appointment.primaryPhysician
+          ? appointment.primaryPhysician
+          : "",
       reason: appointment && appointment.reason ? appointment.reason : "",
       note: appointment && appointment.note ? appointment.note : "",
-      schedule: appointment && appointment.schedule ? new Date(appointment.schedule) : new Date(Date.now()),
-      cancellationReason: appointment && appointment.cancellationReason ? appointment.cancellationReason : "",
+      schedule:
+        appointment && appointment.schedule
+          ? new Date(appointment.schedule)
+          : new Date(Date.now()),
+      cancellationReason:
+        appointment && appointment.cancellationReason
+          ? appointment.cancellationReason
+          : "",
     },
   });
 
@@ -59,7 +75,9 @@ const AppointmentForm = ({
   }
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof AppointmentFormValidation>): Promise<void> {
+  async function onSubmit(
+    values: z.infer<typeof AppointmentFormValidation>,
+  ): Promise<void> {
     setIsLoading(true);
 
     let status: "scheduled" | "cancelled" | "pending";
@@ -82,7 +100,7 @@ const AppointmentForm = ({
           patient: patientId,
           primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
-          reason: values.reason,
+          reason: values.reason!,
           note: values.note,
           status,
         };
@@ -90,12 +108,15 @@ const AppointmentForm = ({
         const appointment = await createAppointment(appointmentData);
         if (appointment) {
           form.reset();
-          router.push(`/patients/${patientId}/new-appointment/success?appointmentId=${appointment.$id}`);
+          router.push(
+            `/patients/${userId}/new-appointment/success?appointmentId=${appointment.$id}`,
+          );
         }
       } else {
+        if (!appointment) throw new Error("Appointment is required");
         const appointmentToUpdate = {
           userId: userId,
-          appointmentId: appointment?.$id!,
+          appointmentId: appointment.$id,
           appointment: {
             primaryPhysician: values.primaryPhysician,
             schedule: new Date(values.schedule),
@@ -107,12 +128,15 @@ const AppointmentForm = ({
         // Call the update appointment function here if needed
         const updatedAppointment = await updateAppointment(appointmentToUpdate);
         if (updatedAppointment) {
-          setOpen && setOpen(false);
+          setOpen?.(false);
           form.reset();
         }
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
+      form.setError("root", {
+        message:
+          "Unable to save appointment. Please sign in again or try later.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -132,16 +156,15 @@ const AppointmentForm = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
         {type === "create" && (
-        <section className="mb-12 space-y-4">
-          <h1 className="header">New Appointment</h1>
-          <p className="text-dark-700">
-            Request a new appointment for the patient.
-          </p>
-        </section>
+          <section className="mb-12 space-y-4">
+            <h1 className="header">New Appointment</h1>
+            <p className="text-dark-700">
+              Request a new appointment for the patient.
+            </p>
+          </section>
         )}
         {type !== "cancel" && (
           <>
-
             <CustomFormField
               fieldType={FormFieldType.SELECT}
               control={form.control}
@@ -202,6 +225,11 @@ const AppointmentForm = ({
           />
         )}
 
+        {form.formState.errors.root && (
+          <p role="alert" className="shad-error">
+            {form.formState.errors.root.message}
+          </p>
+        )}
         <SubmitButton
           className={`${type === "cancel" ? "shad-danger-btn" : "shad-primary-btn"}`}
           isLoading={isLoading}

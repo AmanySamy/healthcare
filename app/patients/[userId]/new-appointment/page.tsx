@@ -16,9 +16,7 @@ const NewAppointment = async ({
   if (patient.userId !== userId) {
     redirect(`/patients/${patient.userId}/new-appointment`);
   }
-  Sentry.metrics.count("user_view_new_appointment", 1, {
-    attributes: { user_name: patient.name },
-  });
+  Sentry.metrics.count("user_view_new_appointment", 1);
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container">
@@ -30,8 +28,11 @@ const NewAppointment = async ({
             height={1000}
             className="mb-12 h-10 w-fit"
           />
-          <AppointmentForm type='create' userId={userId} patientId={patient?.$id} />
-
+          <AppointmentForm
+            type="create"
+            userId={userId}
+            patientId={patient?.$id}
+          />
         </div>
       </section>
 

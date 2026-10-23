@@ -23,20 +23,21 @@ export default async function Home({
           />
           <PatientForm />
           <div className="text-14-regular mt-20 flex justify-end">
-            <Link href="/?admin-true" className="text-green-500">Admin</Link>
+            <Link href="/?admin=true" className="text-green-500">
+              Admin
+            </Link>
           </div>
         </div>
       </section>
 
-        <Image
-          className="side-img max-w-[50%]"
-          src="/assets/images/onboarding-img.png"
-          alt="Onboarding image"
-          width={1000}
-          height={1000}
-          priority
-        />
-
+      <Image
+        className="side-img max-w-[50%]"
+        src="/assets/images/onboarding-img.png"
+        alt="Onboarding image"
+        width={1000}
+        height={1000}
+        priority
+      />
     </div>
   );
 }

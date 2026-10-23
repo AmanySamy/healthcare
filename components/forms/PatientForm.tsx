@@ -1,7 +1,7 @@
 "use client";
-import React, { use } from "react";
+import React from "react";
 
-import { set, z } from "zod";
+import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +9,12 @@ import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { UserFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
-import { createUser } from "@/lib/actions/patient.actions";
+import { createUser, verifyPatientCode } from "@/lib/actions/patient.actions";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 export enum FormFieldType {
   INPUT = "input",
   SELECT = "select",
@@ -20,15 +25,12 @@ export enum FormFieldType {
   DATE_PICKER = "datePicker",
   SKELETON = "skeleton",
 }
-const form = z.object({
-  username: z
-    .string()
-    .min(2, { message: "Username must be at least 2 characters long" })
-    .max(50, { message: "Username must be at most 50 characters long" }),
-});
 const PatientForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
+  const [pendingUserId, setPendingUserId] = React.useState("");
+  const [code, setCode] = React.useState("");
+  const [error, setError] = React.useState("");
 
   const form = useForm<z.infer<typeof UserFormValidation>>({
     resolver: zodResolver(UserFormValidation),
@@ -42,19 +44,26 @@ const PatientForm = () => {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof UserFormValidation>) {
     setIsLoading(true);
+    setError("");
     try {
       const user = {
         name: values.name,
         email: values.email,
         phone: values.phone,
       };
-      const newUser = await createUser(user);
-      if (newUser) {
-        console.log('newUser', newUser)
-        router.push(`/patients/${newUser.$id}/register`);
+      if (pendingUserId) {
+        const verified = await verifyPatientCode(pendingUserId, code, user);
+        setCode("");
+        router.push(`/patients/${verified.$id}/register`);
+      } else {
+        const newUser = await createUser(user);
+        setPendingUserId(newUser.$id);
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
+      setCode("");
+      setError(
+        "Unable to verify access. Check your email code or try again later.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +102,49 @@ const PatientForm = () => {
           iconAlt="Phone Icon"
           control={form.control}
         />
-        <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
+        {pendingUserId && (
+          <div className="space-y-4">
+            <label htmlFor="patient-code" className="shad-input-label">
+              Email verification code
+            </label>
+            <InputOTP
+              id="patient-code"
+              maxLength={6}
+              value={code}
+              onChange={setCode}
+              autoComplete="one-time-code"
+            >
+              <InputOTPGroup className="shad-otp">
+                {Array.from({ length: 6 }, (_, index) => (
+                  <InputOTPSlot
+                    key={index}
+                    className="shad-otp-slot"
+                    index={index}
+                  />
+                ))}
+              </InputOTPGroup>
+            </InputOTP>
+            <button
+              type="button"
+              className="text-14-regular"
+              disabled={isLoading}
+              onClick={() => {
+                setPendingUserId("");
+                setCode("");
+              }}
+            >
+              Use another email
+            </button>
+          </div>
+        )}
+        {error && (
+          <p role="alert" className="shad-error">
+            {error}
+          </p>
+        )}
+        <SubmitButton isLoading={isLoading}>
+          {pendingUserId ? "Verify email" : "Get Started"}
+        </SubmitButton>
       </form>
     </Form>
   );

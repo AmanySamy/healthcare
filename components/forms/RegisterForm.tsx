@@ -56,7 +56,6 @@ const RegisterForm = ({ user }: { user: User }) => {
 
     try {
       const patientData = {
-
         userId: user.$id,
         name: values.name,
         email: values.email,
@@ -80,16 +79,14 @@ const RegisterForm = ({ user }: { user: User }) => {
         privacyConsent: values.privacyConsent,
       };
 
-      // Log the final payload for now
-      console.log("Patient Registration Payload:", patientData);
-
       const newPatient = await registerPatient(patientData);
-      console.log("New Patient Created:", newPatient);
       if (newPatient) {
         router.push(`/patients/${user.$id}/new-appointment`);
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
+      form.setError("root", {
+        message: "Unable to register. Please sign in again or try later.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -170,7 +167,10 @@ const RegisterForm = ({ user }: { user: User }) => {
                     {GenderOptions.map((option, i) => (
                       <div key={option + i} className="radio-group">
                         <RadioGroupItem value={option} id={option} />
-                        <Label htmlFor={option} className="cursor-pointer capitalize text-white">
+                        <Label
+                          htmlFor={option}
+                          className="cursor-pointer capitalize text-white"
+                        >
                           {option}
                         </Label>
                       </div>
@@ -233,7 +233,7 @@ const RegisterForm = ({ user }: { user: User }) => {
             name="primaryPhysician"
             label="Primary Care Physician"
             placeholder="Select a physician"
-            >
+          >
             {Doctors.map((doctor, i) => (
               <SelectItem key={doctor.name + i} value={doctor.name}>
                 <div className="flex cursor-pointer items-center gap-2">
@@ -380,6 +380,11 @@ const RegisterForm = ({ user }: { user: User }) => {
           />
         </section>
 
+        {form.formState.errors.root && (
+          <p role="alert" className="shad-error">
+            {form.formState.errors.root.message}
+          </p>
+        )}
         <SubmitButton isLoading={isLoading}>Submit and Continue</SubmitButton>
       </form>
     </Form>

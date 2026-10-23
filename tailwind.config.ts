@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
-
-const { fontFamily } = require("tailwindcss/defaultTheme");
+import defaultTheme from "tailwindcss/defaultTheme";
+import animate from "tailwindcss-animate";
 
 const config = {
   darkMode: "class",
@@ -47,7 +47,7 @@ const config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
       },
       backgroundImage: {
         appointments: "url('/assets/images/appointments-bg.png')",
@@ -75,7 +75,7 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;
 
 export default config;

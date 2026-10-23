@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Doctors } from "@/constants";
 import { getAppointment } from "@/lib/actions/appointment.actions";
-import { getPatient, getUser } from "@/lib/actions/patient.actions";
 import * as Sentry from "@sentry/nextjs";
 import { formatDateTime } from "@/lib/utils";
 import Image from "next/image";
@@ -11,14 +10,9 @@ const Success = async ({ params, searchParams }: SearchParamProps) => {
   const { userId } = await params;
   const resolvedSearchParams = await searchParams;
   const appointmentId = (resolvedSearchParams.appointmentId as string) || "";
-  const appointment = await getAppointment(appointmentId);
+  const appointment = await getAppointment(appointmentId, userId);
 
-  const user = await getPatient(userId);
-  console.log("User:",userId, user);
-
-  Sentry.metrics.count("user_view_new_appointment_success", 1, {
-    attributes: { user_name: user.name },
-  });
+  Sentry.metrics.count("user_view_new_appointment_success", 1);
   const doctor = Doctors.find(
     (doc) => doc.name === appointment?.primaryPhysician,
   );
@@ -46,7 +40,7 @@ const Success = async ({ params, searchParams }: SearchParamProps) => {
             Your <span className="text-green-500">appointment request</span> has
             been successfully submitted!
           </h2>
-          <p>We'll be in touch shortly to confirm.</p>
+          <p>We&apos;ll be in touch shortly to confirm.</p>
         </section>
         <section className="request-details">
           <p>Requested appointment details:</p>
@@ -77,7 +71,6 @@ const Success = async ({ params, searchParams }: SearchParamProps) => {
             New Appointment
           </Link>
         </Button>
-
       </div>
     </div>
   );

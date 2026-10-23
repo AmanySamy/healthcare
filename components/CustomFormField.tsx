@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Control } from "react-hook-form";
+import { Control, FieldPath, FieldValues } from "react-hook-form";
 import { FormFieldType } from "./forms/PatientForm";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
@@ -24,10 +24,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
-interface CustomProps {
-  control: Control<any>;
+interface CustomProps<
+  TValues extends FieldValues,
+  TOutput extends FieldValues,
+> {
+  control: Control<TValues, any, TOutput>;
   fieldType?: FormFieldType;
-  name: string;
+  name: FieldPath<TValues>;
   label?: string;
   placeholder?: string;
   iconSrc?: string;
@@ -39,7 +42,13 @@ interface CustomProps {
   renderSkeleton?: (field: any) => React.ReactNode;
 }
 
-const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
+const RenderField = <TValues extends FieldValues, TOutput extends FieldValues>({
+  field,
+  props,
+}: {
+  field: any;
+  props: CustomProps<TValues, TOutput>;
+}) => {
   const {
     fieldType,
     placeholder,
@@ -164,7 +173,12 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
   }
 };
 
-const CustomFormField = (props: CustomProps) => {
+const CustomFormField = <
+  TValues extends FieldValues,
+  TOutput extends FieldValues,
+>(
+  props: CustomProps<TValues, TOutput>,
+) => {
   const { control, fieldType, name, label } = props;
 
   return (
